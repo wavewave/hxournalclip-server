@@ -48,8 +48,8 @@ Library
                  yesod-form == 0.3.*, 
                  blaze-html == 0.4.*
   Exposed-Modules: 
-                   Application.Hxournal.NetworkClipboard.Server.Type
-                   Application.Hxournal.NetworkClipboard.Server.Yesod
+                   Application.HXournal.NetworkClipboard.Server.Type
+                   Application.HXournalx.NetworkClipboard.Server.Yesod
 
 
 

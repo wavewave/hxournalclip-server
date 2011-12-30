@@ -4,31 +4,31 @@
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Application.Hxournal.NetworkClipboard.Server.Yesod where 
+module Application.HXournal.NetworkClipboard.Server.Yesod where 
 
 import Yesod hiding (update)
 import Network.Wai
 import qualified Data.Enumerator.List as EL
 import qualified Data.ByteString as S
-import Application.Hxournal.NetworkClipboard.Type
+import Application.HXournal.NetworkClipboard.Type
 import Data.Acid
 import Data.Attoparsec as P
 import Data.Aeson as A
 import Data.UUID
-import Application.Hxournal.NetworkClipboard.Server.Type
+import Application.HXournal.NetworkClipboard.Server.Type
 
-mkYesod "HxournalclipServer" [parseRoutes|
+mkYesod "HXournalClipServer" [parseRoutes|
 / HomeR GET
-/listhxournalclip  ListHxournalclipR GET
-/uploadhxournalclip  UploadHxournalclipR POST
-/hxournalclip/#UUID HxournalclipR 
+/listhxournalclip  ListHXournalClipR GET
+/uploadhxournalclip  UploadHXournalClipR POST
+/hxournalclip/#UUID HXournalClipR 
 |]
 
-instance Yesod HxournalclipServer where
+instance Yesod HXournalClipServer where
   approot _ = ""
   maximumContentLength _ _ = 100000000
 
-{-instance RenderMessage HxournalclipServer FormMessage where
+{-instance RenderMessage HXournalClipServer FormMessage where
   renderMessage _ _ = defaultFormMessage -}
 
 
@@ -49,8 +49,8 @@ defhlet :: GGWidget m Handler ()
 defhlet = [whamlet| <h1> HTML output not supported |]
 
 
-getListHxournalclipR :: Handler RepHtmlJson
-getListHxournalclipR = do 
+getListHXournalClipR :: Handler RepHtmlJson
+getListHXournalClipR = do 
   liftIO $ putStrLn "getQueueListR called" 
   acid <- return.server_acid =<< getYesod
   r <- liftIO $ query acid QueryAll
@@ -58,8 +58,8 @@ getListHxournalclipR = do
   defaultLayoutJson defhlet (A.toJSON (Just r))
 
 
-postUploadHxournalclipR :: Handler RepHtmlJson
-postUploadHxournalclipR = do 
+postUploadHXournalClipR :: Handler RepHtmlJson
+postUploadHXournalClipR = do 
   liftIO $ putStrLn "postQueueR called" 
   acid <- return.server_acid =<< getYesod
   _ <- getRequest
@@ -68,46 +68,46 @@ postUploadHxournalclipR = do
   let parsed = parse json bs 
   case parsed of 
     Done _ parsedjson -> do 
-      case (A.fromJSON parsedjson :: A.Result HxournalclipInfo) of 
+      case (A.fromJSON parsedjson :: A.Result HXournalClipInfo) of 
         Success minfo -> do 
-          r <- liftIO $ update acid (AddHxournalclip minfo)
+          r <- liftIO $ update acid (AddHXournalClip minfo)
           liftIO $ print (Just r)
           liftIO $ print (A.toJSON (Just r))
           defaultLayoutJson defhlet (A.toJSON (Just r))
         Error err -> do 
           liftIO $ putStrLn err 
-          defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HxournalclipInfo))
+          defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HXournalClipInfo))
     Fail _ ctxts err -> do 
       liftIO $ putStrLn (concat ctxts++err)
-      defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HxournalclipInfo))
+      defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HXournalClipInfo))
     Partial _ -> do 
       liftIO $ putStrLn "partial" 
-      defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HxournalclipInfo))
+      defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HXournalClipInfo))
 
 
 
-handleHxournalclipR :: UUID -> Handler RepHtmlJson
-handleHxournalclipR name = do
+handleHXournalClipR :: UUID -> Handler RepHtmlJson
+handleHXournalClipR name = do
   wr <- return.reqWaiRequest =<< getRequest
   case requestMethod wr of 
-    "GET" -> getHxournalclipR name
-    "PUT" -> putHxournalclipR name
-    "DELETE" -> deleteHxournalclipR name
-    x -> error ("No such action " ++ show x ++ " in handlerHxournalclipR")
+    "GET" -> getHXournalClipR name
+    "PUT" -> putHXournalClipR name
+    "DELETE" -> deleteHXournalClipR name
+    x -> error ("No such action " ++ show x ++ " in handlerHXournalClipR")
 
-getHxournalclipR :: UUID -> Handler RepHtmlJson
-getHxournalclipR idee = do 
-  liftIO $ putStrLn "getHxournalclipR called"
+getHXournalClipR :: UUID -> Handler RepHtmlJson
+getHXournalClipR idee = do 
+  liftIO $ putStrLn "getHXournalClipR called"
   acid <- return.server_acid =<< getYesod
-  r <- liftIO $ query acid (QueryHxournalclip idee)
+  r <- liftIO $ query acid (QueryHXournalClip idee)
   liftIO $ putStrLn $ show r 
   let hlet = [whamlet| <h1> File #{idee}|]
   defaultLayoutJson hlet (A.toJSON (Just r))
 
 
-putHxournalclipR :: UUID -> Handler RepHtmlJson
-putHxournalclipR idee = do 
-  liftIO $ putStrLn "putHxournalclipR called"
+putHXournalClipR :: UUID -> Handler RepHtmlJson
+putHXournalClipR idee = do 
+  liftIO $ putStrLn "putHXournalClipR called"
   acid <- return.server_acid =<< getYesod
   _wr <- return.reqWaiRequest =<< getRequest
   bs' <- lift EL.consume
@@ -116,27 +116,27 @@ putHxournalclipR idee = do
   liftIO $ print parsed 
   case parsed of 
     Done _ parsedjson -> do 
-      case (A.fromJSON parsedjson :: A.Result HxournalclipInfo) of 
+      case (A.fromJSON parsedjson :: A.Result HXournalClipInfo) of 
         Success minfo -> do 
           if idee == hxournalclip_uuid minfo
-            then do r <- liftIO $ update acid (UpdateHxournalclip minfo)
+            then do r <- liftIO $ update acid (UpdateHXournalClip minfo)
                     defaultLayoutJson defhlet (A.toJSON (Just r))
             else do liftIO $ putStrLn "hxournalclipname mismatched"
-                    defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HxournalclipInfo))
+                    defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HXournalClipInfo))
         Error err -> do 
           liftIO $ putStrLn err 
-          defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HxournalclipInfo))
+          defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HXournalClipInfo))
     Fail _ ctxts err -> do 
       liftIO $ putStrLn (concat ctxts++err)
-      defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HxournalclipInfo))
+      defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HXournalClipInfo))
          
     Partial _ -> do 
       liftIO $ putStrLn "partial" 
-      defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HxournalclipInfo))
+      defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HXournalClipInfo))
 
-deleteHxournalclipR :: UUID -> Handler RepHtmlJson
-deleteHxournalclipR idee = do 
+deleteHXournalClipR :: UUID -> Handler RepHtmlJson
+deleteHXournalClipR idee = do 
   acid <- return.server_acid =<< getYesod
-  r <- liftIO $ update acid (DeleteHxournalclip idee)
+  r <- liftIO $ update acid (DeleteHXournalClip idee)
   liftIO $ putStrLn $ show r 
   defaultLayoutJson defhlet (A.toJSON (Just r))
