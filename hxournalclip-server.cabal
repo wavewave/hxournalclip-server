@@ -18,6 +18,8 @@ Executable hxournalclip-server
                  bytestring == 0.9.*, 
                  containers == 0.4.*, 
                  acid-state == 0.6.*, 
+                 strict == 0.3.*,
+                 xournal-types, 
                  hxournalclip-type == 0.0.*,
                  hxournalclip-server
   ghc-options: 	-Wall -O2 -threaded -funbox-strict-fields -fno-warn-unused-do-bind
