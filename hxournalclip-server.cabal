@@ -49,7 +49,7 @@ Library
                  blaze-html == 0.4.*
   Exposed-Modules: 
                    Application.HXournal.NetworkClipboard.Server.Type
-                   Application.HXournalx.NetworkClipboard.Server.Yesod
+                   Application.HXournal.NetworkClipboard.Server.Yesod
 
 
 
