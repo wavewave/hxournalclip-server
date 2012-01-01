@@ -91,8 +91,8 @@ handleHXournalClipR name = do
   wr <- return.reqWaiRequest =<< getRequest
   case requestMethod wr of 
     "GET" -> getHXournalClipR name
-    "PUT" -> putHXournalClipR name
-    "DELETE" -> deleteHXournalClipR name
+    -- "PUT" -> putHXournalClipR name
+    --  "DELETE" -> deleteHXournalClipR name
     x -> error ("No such action " ++ show x ++ " in handlerHXournalClipR")
 
 getHXournalClipR :: UUID -> Handler RepHtmlJson
@@ -104,7 +104,7 @@ getHXournalClipR idee = do
   let hlet = [whamlet| <h1> File #{idee}|]
   defaultLayoutJson hlet (A.toJSON (Just r))
 
-
+{-
 putHXournalClipR :: UUID -> Handler RepHtmlJson
 putHXournalClipR idee = do 
   liftIO $ putStrLn "putHXournalClipR called"
@@ -140,3 +140,4 @@ deleteHXournalClipR idee = do
   r <- liftIO $ update acid (DeleteHXournalClip idee)
   liftIO $ putStrLn $ show r 
   defaultLayoutJson defhlet (A.toJSON (Just r))
+-}

@@ -13,14 +13,15 @@ import Data.Strict.Tuple
 import Data.UUID.V5 
 import Application.HXournal.NetworkClipboard.Type 
 
-teststroke = [Stroke "test" "test" 1.1 [ 0.0 :!: 1.0 ] ]
+-- teststroke = [Stroke "test" "test" 1.1 [ 0.0 :!: 1.0 ] ]
 
-teststrokeinfo = HXournalClipInfo namespaceURL teststroke
+-- teststrokeinfo = HXournalClipInfo namespaceURL teststroke
 
 
 
 main :: IO ()
 main = do 
   putStrLn "hxournalclip-server"
-  acid <- openLocalState (M.insert namespaceURL teststrokeinfo M.empty )
+  acid <- openLocalState (HXournalClipInfoRepository [] M.empty)
+     --  (M.insert namespaceURL teststrokeinfo M.empty )
   warpDebug 7800 (HXournalClipServer acid)
