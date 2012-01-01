@@ -22,6 +22,7 @@ mkYesod "HXournalClipServer" [parseRoutes|
 /listhxournalclip  ListHXournalClipR GET
 /uploadhxournalclip  UploadHXournalClipR POST
 /hxournalclip/#UUID HXournalClipR 
+/currentclip CurrentClipR GET
 |]
 
 instance Yesod HXournalClipServer where
@@ -103,6 +104,17 @@ getHXournalClipR idee = do
   liftIO $ putStrLn $ show r 
   let hlet = [whamlet| <h1> File #{idee}|]
   defaultLayoutJson hlet (A.toJSON (Just r))
+
+
+getCurrentClipR :: Handler RepHtmlJson 
+getCurrentClipR = do 
+  liftIO $ putStrLn "getCurrentClipR called"
+  acid <- return.server_acid =<< getYesod
+  r <- liftIO $ query acid QueryAll
+  -- liftIO $ putStrLn $ show r 
+  case r of 
+    [] -> defaultLayoutJson defhlet (A.toJSON (Nothing :: Maybe HXournalClipInfo))
+    (x:xs) -> defaultLayoutJson defhlet (A.toJSON (Just x))
 
 {-
 putHXournalClipR :: UUID -> Handler RepHtmlJson
